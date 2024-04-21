@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto Swapping Widget</title>
+<style>
+    .loader {
+        border: 4px solid #f3f3f3; /* Light grey */
+        border-top: 4px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 2s linear infinite;
+        margin-bottom: 10px;
+        display: none;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+</head>
+<body>
+    <h1>Crypto Swapping Widget</h1>
+    <p>Choose the cryptocurrencies you want to swap:</p>
+    <div>
+        <label for="fromCrypto">From:</label>
+        <select id="fromCrypto">
+            <option value="BTC">Bitcoin (BTC)</option>
+            <option value="ETH">Ethereum (ETH)</option>
+            <option value="BNB">Binance Coin (BNB)</option>
+            <!-- Add up to five other cryptocurrencies here -->
+            <option value="ADA">Cardano (ADA)</option>
+            <option value="LTC">Litecoin (LTC)</option>
+            <option value="DOGE">Dogecoin (DOGE)</option>
+            <option value="XRP">Ripple (XRP)</option>
+            <option value="SOL">Solana (SOL)</option>
+        </select>
+    </div>
+    <div>
+        <label for="toCrypto">To:</label>
+        <select id="toCrypto">
+            <option value="BTC">Bitcoin (BTC)</option>
+            <option value="ETH">Ethereum (ETH)</option>
+            <option value="BNB">Binance Coin (BNB)</option>
+            <!-- Add up to five other cryptocurrencies here -->
+            <option value="ADA">Cardano (ADA)</option>
+            <option value="LTC">Litecoin (LTC)</option>
+            <option value="DOGE">Dogecoin (DOGE)</option>
+            <option value="XRP">Ripple (XRP)</option>
+            <option value="SOL">Solana (SOL)</option>
+        </select>
+    </div>
+    <div>
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" min="0" step="any" placeholder="Enter the amount">
+    </div>
+    <button onclick="swap()">Swap</button>
+    <div class="loader" id="loader"></div>
+    <div id="success" style="display: none;"></div>
+
+    <script>
+        async function swap() {
+            const fromCrypto = document.getElementById("fromCrypto").value;
+            const toCrypto = document.getElementById("toCrypto").value;
+            const amount = document.getElementById("amount").value;
+
+            const pair = fromCrypto.toLowerCase() + "_" + toCrypto.toLowerCase();
+            const url = `https://api.1inch.exchange/v3.0/1/quote?fromTokenAddress=${fromCrypto}&toTokenAddress=${toCrypto}&amount=${amount}`;
+            
+            const loader = document.getElementById("loader");
+            const successMessage = document.getElementById("success");
+
+            try {
+                loader.style.display = "block";
+                successMessage.style.display = "none";
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.toTokenAmount) {
+                    console.log(`Swapping ${amount} ${fromCrypto} to ${data.toTokenAmount} ${toCrypto}`);
+                    console.log("Transaction: ", data);
+                    successMessage.innerHTML = `Swapped ${amount} ${fromCrypto} to ${data.toTokenAmount} ${toCrypto}`;
+                    successMessage.style.display = "block";
+                } else {
+                    console.error("Error in fetching data.");
+                }
+            } catch (error) {
+                console.error("Error: ", error);
+            } finally {
+                loader.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
